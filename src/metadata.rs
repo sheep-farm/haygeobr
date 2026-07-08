@@ -57,10 +57,11 @@ pub fn fetch_metadata() -> Result<Vec<GeoMeta>, String> {
         .map_err(|e| format!("cannot fetch geobr metadata: {e}"))?;
 
     let body = resp.into_string().unwrap_or_default();
-    let release: serde_json::Value = serde_json::from_str(&body)
-        .map_err(|e| format!("cannot parse geobr release JSON: {e}"))?;
+    let release: serde_json::Value =
+        serde_json::from_str(&body).map_err(|e| format!("cannot parse geobr release JSON: {e}"))?;
 
-    let assets = release.get("assets")
+    let assets = release
+        .get("assets")
         .and_then(|a| a.as_array())
         .ok_or("no assets in geobr release")?;
 
@@ -173,8 +174,7 @@ pub fn download_parquet(file_name: &str, dest: &std::path::Path) -> Result<(), S
 
     // Fallback: IPEA mirror
     let url2 = format!("{MIRROR_BASE}/{file_name}");
-    try_download(&url2, dest)
-        .map_err(|e| format!("download failed for {file_name}: {e}"))?;
+    try_download(&url2, dest).map_err(|e| format!("download failed for {file_name}: {e}"))?;
 
     Ok(())
 }
@@ -189,7 +189,6 @@ fn try_download(url: &str, dest: &std::path::Path) -> Result<(), String> {
     let mut reader = resp.into_reader();
     let mut file = std::fs::File::create(dest)
         .map_err(|e| format!("cannot create file {}: {e}", dest.display()))?;
-    std::io::copy(&mut reader, &mut file)
-        .map_err(|e| format!("write error: {e}"))?;
+    std::io::copy(&mut reader, &mut file).map_err(|e| format!("write error: {e}"))?;
     Ok(())
 }

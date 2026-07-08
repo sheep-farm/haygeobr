@@ -8,7 +8,7 @@ repository = "https://github.com/sheep-farm/haygeobr"
 keywords = ["hayashi", "geobr", "gis", "brazil", "plugin"]
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 hayashi-plugin-sdk = { git = "https://github.com/sheep-farm/hayashi-plugin-sdk.git", branch = "main" }

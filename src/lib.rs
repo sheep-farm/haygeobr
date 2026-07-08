@@ -27,23 +27,22 @@
 
 #![allow(clippy::missing_safety_doc, clippy::not_unsafe_ptr_arg_deref)]
 
-use hayashi_plugin_sdk::{hayashi_fn, hayashi_plugin};
 use hayashi_plugin_sdk::value::{HayashiValue, IntoHayashi};
+use hayashi_plugin_sdk::{hayashi_fn, hayashi_plugin};
 use std::sync::Arc;
 
 hayashi_plugin!();
 
-mod wkb;
-mod metadata;
+pub mod metadata;
 mod reader;
+pub mod wkb;
 
-use metadata::{fetch_metadata, find_file, download_parquet, geography_prefix};
+use metadata::{download_parquet, fetch_metadata, find_file, geography_prefix};
 use reader::read_parquet_to_struct;
 
 /// Cache directory for downloaded parquet files.
 fn cache_dir() -> std::path::PathBuf {
-    let dir = std::env::var("HOME")
-        .unwrap_or_else(|_| "/tmp".to_string());
+    let dir = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     let p = std::path::PathBuf::from(dir)
         .join(".hay")
         .join("cache")
@@ -83,7 +82,10 @@ impl GeoOpts {
 
 impl Default for GeoOpts {
     fn default() -> Self {
-        Self { year: None, simplified: true }
+        Self {
+            year: None,
+            simplified: true,
+        }
     }
 }
 
@@ -105,9 +107,11 @@ fn get_parquet(
 
     println!("haygeobr: downloading {}...", entry.file_name);
     download_parquet(&entry.file_name, &local_path)?;
-    println!("haygeobr: downloaded {} ({} KB)",
+    println!(
+        "haygeobr: downloaded {} ({} KB)",
         entry.file_name,
-        local_path.metadata().map(|m| m.len() / 1024).unwrap_or(0));
+        local_path.metadata().map(|m| m.len() / 1024).unwrap_or(0)
+    );
 
     Ok(local_path)
 }
@@ -121,17 +125,13 @@ fn read_geography(
     filter_val: Option<&str>,
 ) -> HayashiValue {
     match get_parquet(geography, year, simplified) {
-        Ok(path) => {
-            match read_parquet_to_struct(&path, filter_col, filter_val) {
-                Ok(struct_array) => {
-                    let array_ref: arrow::array::ArrayRef = Arc::new(struct_array);
-                    array_ref.into_hayashi()
-                }
-                Err(e) => {
-                    HayashiValue::Str(format!("haygeobr error: {e}"))
-                }
+        Ok(path) => match read_parquet_to_struct(&path, filter_col, filter_val) {
+            Ok(struct_array) => {
+                let array_ref: arrow::array::ArrayRef = Arc::new(struct_array);
+                array_ref.into_hayashi()
             }
-        }
+            Err(e) => HayashiValue::Str(format!("haygeobr error: {e}")),
+        },
         Err(e) => HayashiValue::Str(format!("haygeobr error: {e}")),
     }
 }

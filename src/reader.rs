@@ -2,9 +2,8 @@
 //! WKT strings, and returns an Arrow StructArray suitable for Hayashi DataFrame.
 
 use arrow::array::{
-    Array, ArrayRef, BinaryArray, BooleanArray, Float64Array, Int64Array,
-    NullArray, RecordBatch, RecordBatchOptions, RecordBatchReader, StringArray,
-    StructArray,
+    Array, ArrayRef, BinaryArray, BooleanArray, Float64Array, Int64Array, NullArray, RecordBatch,
+    RecordBatchOptions, RecordBatchReader, StringArray, StructArray,
 };
 use arrow::datatypes::{DataType, Field};
 use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
@@ -20,12 +19,13 @@ pub fn read_parquet_to_struct(
     filter_col: Option<&str>,
     filter_val: Option<&str>,
 ) -> Result<StructArray, String> {
-    let file = File::open(path)
-        .map_err(|e| format!("cannot open {}: {e}", path.display()))?;
+    let file = File::open(path).map_err(|e| format!("cannot open {}: {e}", path.display()))?;
 
     let builder = ParquetRecordBatchReaderBuilder::try_new(file)
         .map_err(|e| format!("cannot read parquet: {e}"))?;
-    let reader = builder.build().map_err(|e| format!("parquet reader: {e}"))?;
+    let reader = builder
+        .build()
+        .map_err(|e| format!("parquet reader: {e}"))?;
 
     let schema = reader.schema();
     let fields: Vec<Arc<Field>> = schema.fields().iter().cloned().collect();
@@ -102,11 +102,7 @@ pub fn read_parquet_to_struct(
 }
 
 /// Filter a batch by a column value (string comparison).
-fn filter_batch(
-    batch: &RecordBatch,
-    col_name: &str,
-    value: &str,
-) -> Result<RecordBatch, String> {
+fn filter_batch(batch: &RecordBatch, col_name: &str, value: &str) -> Result<RecordBatch, String> {
     let schema = batch.schema();
     let field_idx = schema
         .fields()
@@ -158,11 +154,7 @@ fn filter_batch(
                 })
                 .collect()
         }
-        _ => {
-            return Err(format!(
-                "cannot filter column '{col_name}' of type {dt}"
-            ))
-        }
+        _ => return Err(format!("cannot filter column '{col_name}' of type {dt}")),
     };
 
     // Apply filter to each column
@@ -174,12 +166,8 @@ fn filter_batch(
         .collect();
 
     let options = RecordBatchOptions::new().with_row_count(None);
-    RecordBatch::try_new_with_options(
-        schema,
-        filtered_cols,
-        &options,
-    )
-    .map_err(|e| format!("filter error: {e}"))
+    RecordBatch::try_new_with_options(schema, filtered_cols, &options)
+        .map_err(|e| format!("filter error: {e}"))
 }
 
 fn make_empty_array(dt: &DataType) -> ArrayRef {
