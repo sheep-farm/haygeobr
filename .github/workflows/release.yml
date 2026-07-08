@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_PROFILE_RELEASE_STRIP: symbols
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            ext: so
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            ext: dylib
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            ext: dll
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Rename and prepare asset
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp target/${{ matrix.target }}/release/haygeobr.dll \
+               dist/haygeobr-${{ matrix.target }}.dll
+          else
+            cp target/${{ matrix.target }}/release/libhaygeobr.${{ matrix.ext }} \
+               dist/haygeobr-${{ matrix.target }}.${{ matrix.ext }}
+          fi
+
+      - name: Upload binaries to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/haygeobr-${{ matrix.target }}.${{ matrix.ext }}
