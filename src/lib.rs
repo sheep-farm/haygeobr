@@ -238,6 +238,134 @@ pub fn read_metro_area(opts: HayashiValue) -> HayashiValue {
     read_geography("metro_area", o.year, o.simplified, None, None)
 }
 
+/// haygeobr::read_census_tract({"year": 2022})
+/// Download spatial data of census tracts (setores censitários).
+#[hayashi_fn]
+pub fn read_census_tract(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("census_tract", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_disaster_risk_area({"year": 2022})
+/// Download spatial data of disaster risk areas.
+#[hayashi_fn]
+pub fn read_disaster_risk_area(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("disaster_risk_area", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_favelas({"year": 2024})
+/// Download spatial data of favelas and urban communities.
+#[hayashi_fn]
+pub fn read_favelas(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("favelas", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_health_facilities({"year": 2024})
+/// Download spatial data of health facilities.
+#[hayashi_fn]
+pub fn read_health_facilities(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("health_facility", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_health_region({"year": 2022})
+/// Download spatial data of health regions.
+#[hayashi_fn]
+pub fn read_health_region(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("health_region", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_immediate_region({"year": 2022})
+/// Download spatial data of immediate regions (regiões imediatas).
+#[hayashi_fn]
+pub fn read_immediate_region(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("immediate_region", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_intermediate_region({"year": 2022})
+/// Download spatial data of intermediate regions (regiões intermediárias).
+#[hayashi_fn]
+pub fn read_intermediate_region(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("intermediate_region", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_municipal_seat({"year": 2022})
+/// Download spatial data of municipal seats (sede municipal).
+#[hayashi_fn]
+pub fn read_municipal_seat(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("municipal_seat", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_neighborhood({"year": 2022})
+/// Download spatial data of neighborhoods (bairros).
+#[hayashi_fn]
+pub fn read_neighborhood(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("neighborhood", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_polling_place({"year": 2024})
+/// Download spatial data of polling places (locais de votação).
+#[hayashi_fn]
+pub fn read_polling_place(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("polling_place", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_pop_arrangement({"year": 2022})
+/// Download spatial data of population arrangements.
+#[hayashi_fn]
+pub fn read_pop_arrangement(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("pop_arrangement", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_quilombola_land({"year": 2024})
+/// Download spatial data of quilombola lands (territórios quilombolas).
+#[hayashi_fn]
+pub fn read_quilombola_land(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("quilombola_land", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_schools({"year": 2024})
+/// Download spatial data of schools.
+#[hayashi_fn]
+pub fn read_schools(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("schools", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_statistical_grid({"year": 2022})
+/// Download spatial data of statistical grids (grade estatística).
+#[hayashi_fn]
+pub fn read_statistical_grid(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("statistical_grid", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_urban_area({"year": 2015})
+/// Download spatial data of urban areas (áreas urbanizadas).
+#[hayashi_fn]
+pub fn read_urban_area(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("urban_area", o.year, o.simplified, None, None)
+}
+
+/// haygeobr::read_weighting_area({"year": 2022})
+/// Download spatial data of weighting areas (áreas de ponderação).
+#[hayashi_fn]
+pub fn read_weighting_area(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+    read_geography("weighting_area", o.year, o.simplified, None, None)
+}
+
 /// haygeobr::list_datasets()
 /// Returns a list of available geography names.
 #[hayashi_fn]

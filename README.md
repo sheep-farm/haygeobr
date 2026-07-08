@@ -39,22 +39,40 @@ let years = geobr::list_years("states")
 
 ## Available functions
 
-| Function | Description |
-|---|---|
-| `read_country` | Brazil country boundary |
-| `read_state` | Brazilian states (UF) |
-| `read_region` | Brazilian regions (N, NE, SE, S, CO) |
-| `read_municipality` | Municipalities |
-| `read_meso_region` | Meso-regions |
-| `read_micro_region` | Micro-regions |
-| `read_biomes` | Biomes (Amazônia, Cerrado, Caatinga, Mata Atlântica, Pampa, Pantanal) |
-| `read_amazonia_legal` | Legal Amazon area |
-| `read_semi_arid` | Semiarid region |
-| `read_indigenous_land` | Indigenous lands |
-| `read_conservation_unit` | Conservation units |
-| `read_metro_area` | Metropolitan areas |
-| `list_datasets` | List all available geographies |
-| `list_years` | List available years for a geography |
+| Function | geobr (R) | Description |
+|---|---|---|
+| `read_country` | read_country | Brazil country boundary |
+| `read_state` | read_state | Brazilian states (UF) |
+| `read_region` | read_region | Brazilian regions (N, NE, SE, S, CO) |
+| `read_municipality` | read_municipality | Municipalities |
+| `read_municipal_seat` | read_municipal_seat | Municipal seats (sede municipal) |
+| `read_meso_region` | read_meso_region | Meso-regions |
+| `read_micro_region` | read_micro_region | Micro-regions |
+| `read_intermediate_region` | read_intermediate_region | Intermediate regions |
+| `read_immediate_region` | read_immediate_region | Immediate regions |
+| `read_biomes` | read_biomes | Biomes (Amazônia, Cerrado, Caatinga, Mata Atlântica, Pampa, Pantanal) |
+| `read_metro_area` | read_metro_area | Metropolitan areas |
+| `read_urban_area` | read_urban_area | Urban areas (áreas urbanizadas) |
+| `read_amazonia_legal` | read_amazonia_legal | Legal Amazon area |
+| `read_semi_arid` | read_semiarid | Semiarid region |
+| `read_indigenous_land` | read_indigenous_land | Indigenous lands |
+| `read_conservation_unit` | read_conservation_units | Conservation units |
+| `read_disaster_risk_area` | read_disaster_risk_area | Disaster risk areas |
+| `read_favelas` | read_favelas | Favelas and urban communities |
+| `read_quilombola_land` | read_quilombos | Quilombola lands |
+| `read_health_region` | read_health_region | Health regions |
+| `read_health_facilities` | read_health_facilities | Health facilities |
+| `read_schools` | read_schools | Schools |
+| `read_polling_place` | read_polling_places | Polling places (locais de votação) |
+| `read_pop_arrangement` | read_pop_arrangements | Population arrangements |
+| `read_neighborhood` | read_neighborhood | Neighborhoods (bairros) |
+| `read_census_tract` | read_census_tract | Census tracts (setores censitários) |
+| `read_weighting_area` | read_weighting_area | Weighting areas (áreas de ponderação) |
+| `read_statistical_grid` | read_statistical_grid | Statistical grids (grade estatística) |
+| `list_datasets` | — | List all available geographies |
+| `list_years` | — | List available years for a geography |
+
+**Paridade: 28 de 31 funções do geobr (R).** Funções não implementadas (`read_capitals`, `read_comparable_areas`, `read_urban_concentration`) não possuem parquet no release v2.0.0 do geobr_prep_data.
 
 ## Options
 
