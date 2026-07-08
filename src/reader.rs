@@ -82,10 +82,7 @@ pub fn read_parquet_to_struct(
                         None
                     } else {
                         let wkb = binary.value(i);
-                        match wkb_to_wkt(wkb) {
-                            Ok(wkt) => Some(wkt),
-                            Err(_) => None,
-                        }
+                        wkb_to_wkt(wkb).ok()
                     }
                 })
                 .collect();

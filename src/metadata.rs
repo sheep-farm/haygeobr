@@ -1,6 +1,5 @@
 //! Metadata and download utilities for geobr data.
 
-const DATA_RELEASE: &str = "v2.0.0";
 const META_URL: &str = "https://api.github.com/repos/ipea/geobr_prep_data/releases/tags/v2.0.0";
 const DL_BASE: &str = "https://github.com/ipea/geobr_prep_data/releases/download/v2.0.0";
 const MIRROR_BASE: &str = "https://www.ipea.gov.br/geobr/data_v2.0.0";
@@ -193,49 +192,4 @@ fn try_download(url: &str, dest: &std::path::Path) -> Result<(), String> {
     std::io::copy(&mut reader, &mut file)
         .map_err(|e| format!("write error: {e}"))?;
     Ok(())
-}
-
-/// State code → abbreviation mapping (IBGE).
-pub fn state_abbrev(code: i64) -> Option<&'static str> {
-    let map: [(i64, &str); 27] = [
-        (11, "RO"), (12, "AC"), (13, "AM"), (14, "RR"), (15, "PA"),
-        (16, "AP"), (17, "TO"), (21, "MA"), (22, "PI"), (23, "CE"),
-        (24, "RN"), (25, "PB"), (26, "PE"), (27, "AL"), (28, "SE"),
-        (29, "BA"), (31, "MG"), (32, "ES"), (33, "RJ"), (35, "SP"),
-        (41, "PR"), (42, "SC"), (43, "RS"), (50, "MS"), (51, "MT"),
-        (52, "GO"), (53, "DF"),
-    ];
-    map.iter().find(|(c, _)| *c == code).map(|(_, a)| *a)
-}
-
-/// Abbreviation → state code mapping.
-pub fn state_code(abbrev: &str) -> Option<i64> {
-    let abbrev = abbrev.to_uppercase();
-    let map: [(&str, i64); 27] = [
-        ("RO", 11), ("AC", 12), ("AM", 13), ("RR", 14), ("PA", 15),
-        ("AP", 16), ("TO", 17), ("MA", 21), ("PI", 22), ("CE", 23),
-        ("RN", 24), ("PB", 25), ("PE", 26), ("AL", 27), ("SE", 28),
-        ("BA", 29), ("MG", 31), ("ES", 32), ("RJ", 33), ("SP", 35),
-        ("PR", 41), ("SC", 42), ("RS", 43), ("MS", 50), ("MT", 51),
-        ("GO", 52), ("DF", 53),
-    ];
-    map.iter().find(|(a, _)| *a == abbrev.as_str()).map(|(_, c)| *c)
-}
-
-/// Resolve a state filter: "all", abbreviation ("RJ"), or code (33).
-pub fn resolve_state_filter(code: &str) -> Result<Option<(String, String)>, String> {
-    if code == "all" || code.is_empty() {
-        return Ok(None);
-    }
-    // Try abbreviation
-    if let Some(c) = state_code(code) {
-        return Ok(Some(("abbrev_state".into(), c.to_string())));
-    }
-    // Try numeric code
-    if let Ok(c) = code.parse::<i64>() {
-        if (11..=53).contains(&c) {
-            return Ok(Some(("code_state".into(), c.to_string())));
-        }
-    }
-    Err(format!("invalid state code: '{code}' (use 'all', abbreviation like 'RJ', or IBGE code like 33)"))
 }

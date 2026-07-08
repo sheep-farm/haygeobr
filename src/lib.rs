@@ -25,9 +25,10 @@
 //! let ds = geobr::list_datasets()
 //! ```
 
+#![allow(clippy::missing_safety_doc, clippy::not_unsafe_ptr_arg_deref)]
+
 use hayashi_plugin_sdk::{hayashi_fn, hayashi_plugin};
-use hayashi_plugin_sdk::value::{HayashiValue, IntoHayashi, FromHayashi};
-use std::collections::HashMap;
+use hayashi_plugin_sdk::value::{HayashiValue, IntoHayashi};
 use std::sync::Arc;
 
 hayashi_plugin!();
@@ -36,7 +37,7 @@ mod wkb;
 mod metadata;
 mod reader;
 
-use metadata::{fetch_metadata, find_file, download_parquet, resolve_state_filter, geography_prefix};
+use metadata::{fetch_metadata, find_file, download_parquet, geography_prefix};
 use reader::read_parquet_to_struct;
 
 /// Cache directory for downloaded parquet files.
@@ -53,7 +54,6 @@ fn cache_dir() -> std::path::PathBuf {
 
 /// Extract options from a HayashiValue dict.
 struct GeoOpts {
-    code: String,
     year: Option<u32>,
     simplified: bool,
 }
@@ -63,12 +63,6 @@ impl GeoOpts {
         let map = match val {
             HayashiValue::Dict(d) => d,
             _ => return Self::default(),
-        };
-
-        let code = match map.get("code") {
-            Some(HayashiValue::Str(s)) => s.clone(),
-            Some(HayashiValue::Int(i)) => i.to_string(),
-            _ => "all".to_string(),
         };
 
         let year = match map.get("year") {
@@ -83,13 +77,13 @@ impl GeoOpts {
             _ => true,
         };
 
-        Self { code, year, simplified }
+        Self { year, simplified }
     }
 }
 
 impl Default for GeoOpts {
     fn default() -> Self {
-        Self { code: "all".into(), year: None, simplified: true }
+        Self { year: None, simplified: true }
     }
 }
 
