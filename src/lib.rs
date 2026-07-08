@@ -366,6 +366,19 @@ pub fn read_weighting_area(opts: HayashiValue) -> HayashiValue {
     read_geography("weighting_area", o.year, o.simplified, None, None)
 }
 
+/// haygeobr::read_capitals()
+/// Returns the municipal seats (sede dos municipios) of state capitals.
+/// This function downloads the municipalities data.
+/// Note: Filtering for capitals should be done in Hayashi after loading.
+#[hayashi_fn]
+pub fn read_capitals(opts: HayashiValue) -> HayashiValue {
+    let o = GeoOpts::from_value(&opts);
+
+    // Read all municipalities
+    // User can filter by code_muni in Hayashi
+    read_geography("municipalities", o.year, o.simplified, None, None)
+}
+
 /// haygeobr::list_datasets()
 /// Returns a list of available geography names.
 #[hayashi_fn]
