@@ -1,0 +1,28 @@
+import("sheep-farm/haygeobr", as=geobr)
+
+// List datasets
+print("=== Datasets ===")
+print(geobr::list_datasets())
+
+// List years for states
+print("\n=== Years for states ===")
+print(geobr::list_years("states"))
+
+// Read all states
+print("\n=== States ===")
+let ufs = geobr::read_state({"year": 2022})
+print("nrow:", nrow(ufs))
+print("names:", names(ufs))
+print("abbrev:", ufs["abbrev_state"])
+
+// Read country
+print("\n=== Country ===")
+let br = geobr::read_country({"year": 2024})
+print("nrow:", nrow(br))
+print("names:", names(br))
+
+// Read biomes
+print("\n=== Biomes ===")
+let bio = geobr::read_biomes({"year": 2019})
+print("nrow:", nrow(bio))
+print("names:", names(bio))
