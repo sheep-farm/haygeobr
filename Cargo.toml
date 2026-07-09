@@ -1,6 +1,6 @@
 [package]
 name = "haygeobr"
-version = "0.1.0"
+version = "0.1.5"
 edition = "2021"
 description = "Official Brazilian spatial data plugin for Hayashi — powered by geobr/IPEA"
 license = "MIT"
@@ -15,4 +15,13 @@ hayashi-plugin-sdk = { git = "https://github.com/sheep-farm/hayashi-plugin-sdk.g
 serde_json = "1"
 ureq = "2"
 parquet = { version = "59", default-features = false, features = ["arrow", "snap"] }
-arrow = { version = "59", default-features = false, features = ["csv", "json", "ffi"] }
+# arrow é dependência direta porque reader.rs usa arrow::compute (concat_batches, filter)
+# que não está re-exportado pelo hayashi-plugin-sdk (que expõe apenas o feature ffi).
+# A versão deve ser mantida sincronizada com a do hayashi-plugin-sdk.
+arrow = { version = "59", features = ["ffi"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = "symbols"
+panic = "abort"

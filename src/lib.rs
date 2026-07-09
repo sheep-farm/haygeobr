@@ -33,6 +33,91 @@ use std::sync::Arc;
 
 hayashi_plugin!();
 
+#[cfg(test)]
+mod tests {
+    use super::metadata::{find_file, geography_prefix, GeoMeta};
+    use super::wkb::wkb_to_wkt;
+
+    // ── geography_prefix ──────────────────────────────────────────────────────
+
+    #[test]
+    fn test_geography_prefix_not_empty() {
+        let prefixes = geography_prefix();
+        assert!(!prefixes.is_empty());
+    }
+
+    #[test]
+    fn test_geography_prefix_known_entries() {
+        let prefixes = geography_prefix();
+        let find = |name: &str| prefixes.iter().find(|(n, _)| *n == name).map(|(_, p)| *p);
+        assert_eq!(find("country"),        Some("country"));
+        assert_eq!(find("states"),         Some("states"));
+        assert_eq!(find("municipalities"), Some("municipalities"));
+        assert_eq!(find("biomes"),         Some("biomes"));
+    }
+
+    #[test]
+    fn test_geography_prefix_no_duplicates() {
+        let prefixes = geography_prefix();
+        let mut names: Vec<&str> = prefixes.iter().map(|(n, _)| *n).collect();
+        let total = names.len();
+        names.dedup();
+        assert_eq!(names.len(), total, "nomes duplicados em geography_prefix");
+    }
+
+    // ── find_file (sem rede — usa metadados sintéticos) ───────────────────────
+
+    fn mock_meta() -> Vec<GeoMeta> {
+        vec![
+            GeoMeta { file_name: "states_2020_simplified.parquet".into(), geography: "states_2020".into(), year: 2020, simplified: true },
+            GeoMeta { file_name: "states_2022_simplified.parquet".into(), geography: "states_2022".into(), year: 2022, simplified: true },
+            GeoMeta { file_name: "states_2022.parquet".into(),            geography: "states_2022".into(), year: 2022, simplified: false },
+            GeoMeta { file_name: "country_2024_simplified.parquet".into(), geography: "country_2024".into(), year: 2024, simplified: true },
+        ]
+    }
+
+    #[test]
+    fn test_find_file_latest() {
+        let meta = mock_meta();
+        let result = find_file(&meta, "states", None, true).unwrap();
+        assert_eq!(result.year, 2022);
+    }
+
+    #[test]
+    fn test_find_file_exact_year() {
+        let meta = mock_meta();
+        let result = find_file(&meta, "states", Some(2020), true).unwrap();
+        assert_eq!(result.year, 2020);
+    }
+
+    #[test]
+    fn test_find_file_closest_year() {
+        let meta = mock_meta();
+        // Pede 2019, que não existe — o mais próximo é 2020
+        let result = find_file(&meta, "states", Some(2019), true).unwrap();
+        assert_eq!(result.year, 2020);
+        // Pede 2023, que não existe — o mais próximo é 2022
+        let result2 = find_file(&meta, "states", Some(2023), true).unwrap();
+        assert_eq!(result2.year, 2022);
+    }
+
+    #[test]
+    fn test_find_file_simplified_flag() {
+        let meta = mock_meta();
+        let simplified = find_file(&meta, "states", Some(2022), true).unwrap();
+        assert!(simplified.simplified);
+        let detailed = find_file(&meta, "states", Some(2022), false).unwrap();
+        assert!(!detailed.simplified);
+    }
+
+    #[test]
+    fn test_find_file_unknown_geography() {
+        let meta = mock_meta();
+        assert!(find_file(&meta, "nonexistent_place", None, true).is_err());
+    }
+
+}
+
 pub mod metadata;
 mod reader;
 pub mod wkb;
@@ -127,7 +212,7 @@ fn read_geography(
     match get_parquet(geography, year, simplified) {
         Ok(path) => match read_parquet_to_struct(&path, filter_col, filter_val) {
             Ok(struct_array) => {
-                let array_ref: arrow::array::ArrayRef = Arc::new(struct_array);
+                let array_ref: hayashi_plugin_sdk::arrow::array::ArrayRef = Arc::new(struct_array);
                 array_ref.into_hayashi()
             }
             Err(e) => HayashiValue::Str(format!("haygeobr error: {e}")),

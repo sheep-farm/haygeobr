@@ -1,0 +1,28 @@
+// Brazilian spatial data examples with haygeobr
+// Note: these functions download data from IPEA/GitHub on first call
+// and cache to ~/.hay/cache/haygeobr/
+import("sheep-farm/haygeobr", as=geo)
+
+// ── 1. Load Brazil country boundary ──────────────────────────────────────────
+let country = geo::read_country({})
+print("Country geometry loaded, type:", type(country))
+
+// ── 2. Load state boundaries (latest year, simplified) ───────────────────────
+let states = geo::read_state({})
+print("States loaded")
+
+// ── 3. Load state for a specific year ────────────────────────────────────────
+let states_2020 = geo::read_state({"year": 2020})
+print("States 2020 loaded")
+
+// ── 4. Load municipality boundaries for Rio Grande do Sul (code 43) ──────────
+let rs = geo::read_municipality({"code_muni": 43})
+print("RS municipalities loaded")
+
+// ── 5. Load biome boundaries ──────────────────────────────────────────────────
+let biomes = geo::read_biomes({})
+print("Biomes loaded")
+
+// ── 6. Load Amazon legal area ────────────────────────────────────────────────
+let amazon = geo::read_amazonia_legal({})
+print("Amazônia Legal loaded")
