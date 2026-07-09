@@ -116,7 +116,9 @@ fn filter_batch(batch: &RecordBatch, col_name: &str, value: &str) -> Result<Reco
     // Build a filter mask
     let mask: Vec<bool> = match dt {
         DataType::Utf8 => {
-            let arr = col.as_any().downcast_ref::<StringArray>()
+            let arr = col
+                .as_any()
+                .downcast_ref::<StringArray>()
                 .ok_or_else(|| format!("column '{col_name}' type mismatch (expected Utf8)"))?;
             (0..arr.len())
                 .map(|i| {
@@ -129,7 +131,9 @@ fn filter_batch(batch: &RecordBatch, col_name: &str, value: &str) -> Result<Reco
                 .collect()
         }
         DataType::Float64 => {
-            let arr = col.as_any().downcast_ref::<Float64Array>()
+            let arr = col
+                .as_any()
+                .downcast_ref::<Float64Array>()
                 .ok_or_else(|| format!("column '{col_name}' type mismatch (expected Float64)"))?;
             let val_f: f64 = value.parse().unwrap_or(f64::NAN);
             (0..arr.len())
@@ -143,7 +147,9 @@ fn filter_batch(batch: &RecordBatch, col_name: &str, value: &str) -> Result<Reco
                 .collect()
         }
         DataType::Int64 => {
-            let arr = col.as_any().downcast_ref::<Int64Array>()
+            let arr = col
+                .as_any()
+                .downcast_ref::<Int64Array>()
                 .ok_or_else(|| format!("column '{col_name}' type mismatch (expected Int64)"))?;
             let val_i: i64 = value.parse().unwrap_or(i64::MIN);
             (0..arr.len())

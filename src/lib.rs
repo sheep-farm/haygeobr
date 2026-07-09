@@ -50,10 +50,10 @@ mod tests {
     fn test_geography_prefix_known_entries() {
         let prefixes = geography_prefix();
         let find = |name: &str| prefixes.iter().find(|(n, _)| *n == name).map(|(_, p)| *p);
-        assert_eq!(find("country"),        Some("country"));
-        assert_eq!(find("states"),         Some("states"));
+        assert_eq!(find("country"), Some("country"));
+        assert_eq!(find("states"), Some("states"));
         assert_eq!(find("municipalities"), Some("municipalities"));
-        assert_eq!(find("biomes"),         Some("biomes"));
+        assert_eq!(find("biomes"), Some("biomes"));
     }
 
     #[test]
@@ -69,10 +69,30 @@ mod tests {
 
     fn mock_meta() -> Vec<GeoMeta> {
         vec![
-            GeoMeta { file_name: "states_2020_simplified.parquet".into(), geography: "states_2020".into(), year: 2020, simplified: true },
-            GeoMeta { file_name: "states_2022_simplified.parquet".into(), geography: "states_2022".into(), year: 2022, simplified: true },
-            GeoMeta { file_name: "states_2022.parquet".into(),            geography: "states_2022".into(), year: 2022, simplified: false },
-            GeoMeta { file_name: "country_2024_simplified.parquet".into(), geography: "country_2024".into(), year: 2024, simplified: true },
+            GeoMeta {
+                file_name: "states_2020_simplified.parquet".into(),
+                geography: "states_2020".into(),
+                year: 2020,
+                simplified: true,
+            },
+            GeoMeta {
+                file_name: "states_2022_simplified.parquet".into(),
+                geography: "states_2022".into(),
+                year: 2022,
+                simplified: true,
+            },
+            GeoMeta {
+                file_name: "states_2022.parquet".into(),
+                geography: "states_2022".into(),
+                year: 2022,
+                simplified: false,
+            },
+            GeoMeta {
+                file_name: "country_2024_simplified.parquet".into(),
+                geography: "country_2024".into(),
+                year: 2024,
+                simplified: true,
+            },
         ]
     }
 
@@ -115,7 +135,6 @@ mod tests {
         let meta = mock_meta();
         assert!(find_file(&meta, "nonexistent_place", None, true).is_err());
     }
-
 }
 
 pub mod metadata;
