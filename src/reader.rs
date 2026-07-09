@@ -6,6 +6,7 @@ use arrow::array::{
     RecordBatchOptions, RecordBatchReader, StringArray, StructArray,
 };
 use arrow::datatypes::{DataType, Field};
+use std::collections::HashMap as ArrowMeta;
 use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
 use std::fs::File;
 use std::sync::Arc;
@@ -87,7 +88,16 @@ pub fn read_parquet_to_struct(
                 })
                 .collect();
 
-            let wkt_field = Arc::new(Field::new("geometry", DataType::Utf8, true));
+            // Marca o field com extension metadata para que o host Hayashi
+            // reconheça a coluna como Geometry (WKT) e não como Str genérica.
+            let mut meta = ArrowMeta::new();
+            meta.insert(
+                "ARROW:extension:name".to_string(),
+                "hayashi.geometry.wkt".to_string(),
+            );
+            let wkt_field = Arc::new(
+                Field::new("geometry", DataType::Utf8, true).with_metadata(meta),
+            );
             let wkt_array = Arc::new(StringArray::from(wkt_strings)) as ArrayRef;
             out_fields.push(wkt_field);
             out_arrays.push(wkt_array);

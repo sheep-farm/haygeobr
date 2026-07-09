@@ -27,7 +27,7 @@
 
 #![allow(clippy::missing_safety_doc, clippy::not_unsafe_ptr_arg_deref)]
 
-use hayashi_plugin_sdk::value::{HayashiValue, IntoHayashi};
+use hayashi_plugin_sdk::value::{Geometry, HayashiValue, IntoHayashi};
 use hayashi_plugin_sdk::{hayashi_fn, hayashi_plugin};
 use std::sync::Arc;
 
@@ -134,6 +134,32 @@ mod tests {
     fn test_find_file_unknown_geography() {
         let meta = mock_meta();
         assert!(find_file(&meta, "nonexistent_place", None, true).is_err());
+    }
+
+    #[test]
+    fn test_geometry_col_extracts_wkt() {
+        use super::{Geometry, HayashiValue};
+        use std::collections::HashMap;
+
+        let mut map = HashMap::new();
+        map.insert(
+            "geometry".to_string(),
+            HayashiValue::List(vec![
+                HayashiValue::Str("POINT(-43.0 -22.0)".to_string()),
+                HayashiValue::Str("POLYGON((0 0,1 0,1 1,0 0))".to_string()),
+            ]),
+        );
+        let result = super::__hayashi_impl_geometry_col(HayashiValue::Dict(map));
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].wkt(), "POINT(-43.0 -22.0)");
+        assert_eq!(result[1].wkt(), "POLYGON((0 0,1 0,1 1,0 0))");
+    }
+
+    #[test]
+    fn test_geometry_col_empty_on_missing_col() {
+        use super::HayashiValue;
+        let result = super::__hayashi_impl_geometry_col(HayashiValue::Nil);
+        assert!(result.is_empty());
     }
 }
 
@@ -523,5 +549,37 @@ pub fn list_years(geography: HayashiValue) -> HayashiValue {
             HayashiValue::List(vals)
         }
         Err(e) => HayashiValue::Str(format!("haygeobr error: {e}")),
+    }
+}
+
+/// haygeobr::geometry_col(df)
+///
+/// Extrai a coluna `geometry` de um DataFrame retornado por `read_*()` e
+/// devolve uma lista de `Geometry` (WKT). Use para conectar o pipeline
+/// `haygeobr → hayspatial` ou `haygeobr → haygeom::add_layer`.
+///
+/// # Exemplo (.hay)
+/// ```hay
+/// let estados = haygeobr::read_state({})
+/// let geoms = haygeobr::geometry_col(estados)
+/// // geoms é Vec<Geometry> — cada elemento é um WKT de estado
+/// ```
+#[hayashi_fn]
+pub fn geometry_col(df: HayashiValue) -> Vec<Geometry> {
+    match &df {
+        HayashiValue::Dict(map) => {
+            if let Some(HayashiValue::List(col)) = map.get("geometry") {
+                col.iter()
+                    .map(|v| match v {
+                        HayashiValue::Str(s) => Geometry::from_wkt(s),
+                        HayashiValue::Geometry(s) => Geometry::from_wkt(s),
+                        _ => Geometry::from_wkt(""),
+                    })
+                    .collect()
+            } else {
+                vec![]
+            }
+        }
+        _ => vec![],
     }
 }
